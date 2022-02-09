@@ -17,6 +17,7 @@ function SignPage() {
 
   let navigate = useNavigate()
 
+  // 이벤트 등록
   const onEmailHandler = (event) => {
     setEmail(event.currentTarget.value)
   }
@@ -49,74 +50,80 @@ function SignPage() {
   const checkEmail = (event) => {
     event.preventDefault();
 
-    axios.post('/api/check/email', {email: email})
-        .then((response) => {
-          if (response.data === true) {
-            setNum(1)
-            alert('사용가능한 Email입니다.');
-          } else {
-            setNum(2)
-            alert('이미 사용중인 Email입니다.');
-          }
-        })
-        .catch((error) => console.log(error))
+    axios.post('/api/check/email', { email: email })
+      .then((response) => {
+        if (response.data === true) {
+          setNum(1) // 사용가능한 Email을 입력했다는 의미로 1 저장
+          alert('사용가능한 Email입니다.');
+        } else {
+          setNum(2) // 이미 사용중인 Email을 입력했다는 의미로 2 저장
+          alert('이미 사용중인 Email입니다.');
+        }
+      })
+      .catch((error) => console.log(error))
   }
 
   const OnSignSubmitHandler = (event) => {
     event.preventDefault();
 
+    // 예외 처리들
     if (Num === 0) {
-      alert('Email 중복확인을 하세요.')
+      alert('Email 중복확인을 하세요.');
+      return
     } else if (Num === 2) {
-      alert('이미 사용중인 Email입니다.')
+      alert('이미 사용중인 Email입니다.');
       return
     }
 
-    password !== ConfirmPassword && alert("비밀번호가 서로 다릅니다.")
+    if (password !== ConfirmPassword) {
+      alert("비밀번호가 서로 다릅니다.");
+      return
+    }
 
-    if (email === '' || password === '' || ConfirmPassword ==='' || name === '' || birth === '' || major === '' || hobby === '') {
-      alert('입력칸을 다 채우세요.')
+    if (email === '' || password === '' || ConfirmPassword === '' || name === '' || birth === '' || major === '' || hobby === '') {
+      alert('입력칸을 다 채우세요.');
+      return
     }
 
     // 서버에 사용자가 입력한 데이터 전송 후 회원가입이 완료되면 login하라는 경고창을 띄우고 login 페이지로 이동
     axios.post("/api/users/create", {
       email: email, password: password, name: name, birth: birth, major: major, hobby: hobby
     })
-        .then((response) => {
-          if (response.statusText === 'OK') {
-            alert('회원가입이 완료되었습니다. 다시 로그인해주세요.')
-            navigate('/')
-          } else {
-            alert('회원가입에 실패했습니다.')
-          }
-        })
-        .catch((error) => console.log(error))
+      .then((response) => {
+        if (response.statusText === 'OK') {
+          alert('회원가입이 완료되었습니다. 다시 로그인해주세요.')
+          navigate('/')
+        } else {
+          alert('회원가입에 실패했습니다.')
+        }
+      })
+      .catch((error) => console.log(error))
   }
 
   return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100vh' }}>
-        <form style={{ display: 'flex', flexDirection: 'column' }} onSubmit={OnSignSubmitHandler}>
-          <h3>Sign-in</h3><br />
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100vh' }}>
+      <form style={{ display: 'flex', flexDirection: 'column', width: '25%' }} onSubmit={OnSignSubmitHandler}>
+        <h3>Sign-in</h3><br />
 
-          <input type="email" value={email} onChange={onEmailHandler} placeholder='Email' autoFocus />
+        <input type="email" value={email} onChange={onEmailHandler} placeholder='Email' autoFocus />
 
-          <button style={style} onClick={checkEmail}>중복확인</button>
+        <button style={style} onClick={checkEmail}>중복확인</button>
 
-          <input type="password" value={password} onChange={onPasswordHandler} placeholder='Password' /><br />
+        <input type="password" value={password} onChange={onPasswordHandler} placeholder='Password' /><br />
 
-          <input type="password" value={ConfirmPassword} onChange={onConfirmPasswordHandler} placeholder='Confrim Password' /><br />
+        <input type="password" value={ConfirmPassword} onChange={onConfirmPasswordHandler} placeholder='Confrim Password' /><br />
 
-          <input type="text" value={name} onChange={onNameHandler} placeholder='name' /><br />
+        <input type="text" value={name} onChange={onNameHandler} placeholder='name' /><br />
 
-          <input type="date" value={birth} onChange={onBirthHandler} placeholder='birth' /><br />
+        <input type="date" value={birth} onChange={onBirthHandler} placeholder='birth' /><br />
 
-          <input type="text" value={major} onChange={onMajorHandler} placeholder='major' /><br />
+        <input type="text" value={major} onChange={onMajorHandler} placeholder='major' /><br />
 
-          <input type="text" value={hobby} onChange={onHobbyHandler} placeholder='hobby' /><br />
+        <input type="text" value={hobby} onChange={onHobbyHandler} placeholder='hobby' /><br />
 
-          <button type='submit' style={style}>회원가입 완료</button>
-        </form>
-      </div>
+        <button type='submit' style={style}>회원가입 완료</button>
+      </form>
+    </div>
   )
 }
 
